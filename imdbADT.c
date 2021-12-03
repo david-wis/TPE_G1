@@ -2,7 +2,7 @@
 // Created by david on 12/3/21.
 //
 
-#include "ImdbADT.h"
+#include "imdbADT.h"
 
 #include <stdlib.h>
 #include <stdio.h>
