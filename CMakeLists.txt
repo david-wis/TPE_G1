@@ -3,4 +3,4 @@ project(TPE_G1 C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_executable(TPE_G1 main.c)
+add_executable(TPE_G1 main.c ImdbADT.c utils.c utils.h title.c title.h)
