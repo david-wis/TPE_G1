@@ -4,6 +4,7 @@
 
 #ifndef TPE_G1_TITLE_H
 #define TPE_G1_TITLE_H
+
 //estructura de titulo
 typedef struct tTitle{
     char * id;

@@ -4,9 +4,15 @@
 
 #include <stdio.h>
 #include "csvADT.h"
+#include "utils.h"
+#include "title.h"
+#define BUFFER_SIZE 256
+#define FILE_ERROR "Could not open file"
+#define DELIM ";"
 
 typedef struct csvCDT {
     FILE * file;
+    size_t line;
 } csvCDT;
 
 static char * readLine(FILE * f) {
