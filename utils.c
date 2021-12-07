@@ -21,13 +21,13 @@ void * safeMalloc(size_t bytes) {
     return m;
 }
 
-void * safeCalloc(size_t bytes, size_t size){
+void * safeCalloc(size_t size, size_t bytes){
     void * m = calloc(size, bytes);
     checkInvalidMemory(m);
     return m;
 }
 
-void * safeRealloc(size_t bytes, void * p){
+void * safeRealloc(void * p, size_t bytes){
     void * m = realloc(p, bytes);
     checkInvalidMemory(m);
     return m;

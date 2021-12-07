@@ -8,7 +8,7 @@
 
 void * safeMalloc(size_t bytes);
 
-void * safeCalloc(size_t bytes, size_t size);
+void * safeCalloc(size_t size, size_t bytes);
 
 void * safeRealloc(size_t bytes, void * p);
 #endif //TPE_G1_UTILS_H
