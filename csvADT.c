@@ -20,13 +20,17 @@ typedef struct csvCDT {
 static char * readLine(FILE * f) {
     char * c = safeMalloc(BUFFER_SIZE);
     size_t len = 0;
-    while ((fgets(c + len, BUFFER_SIZE-1, f)) != NULL) {
-        len += strlen(c + len);
-        c = safeRealloc(c, len + BUFFER_SIZE);
-    }
-    c = safeRealloc(c, len);
-    fclose(f);
-    if (len > 0)
+    char * p;
+    do {
+       p = fgets(c + len, BUFFER_SIZE-1, f);
+       if (p != NULL) {
+           len += strlen(c + len);
+           c = safeRealloc(c, len + BUFFER_SIZE);
+       }
+    } while(p != NULL && len > 0 && c[len-1] != '\n');
+    if (!len)
+        return NULL;
+    if (c[len-1]=='\n')
         c[len-1] = 0;
     return c;
 }
@@ -42,8 +46,9 @@ csvADT newCsv(char * path, char * mode) {
     return csv;
 }
 
-int closeFile(csvADT csv){
-    return fclose(csv->file);
+void closeFile(csvADT csv){
+    fclose(csv->file);
+    free(csv);
 }
 
 char * readNextString(csvADT csv) {
@@ -84,3 +89,6 @@ tTitle * readNextTitle(csvADT csv, char ** genres, char ** titleTypes) {
     return title;
 }
 
+int eof(csvADT csv) {
+     return feof(csv->file);
+}

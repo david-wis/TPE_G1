@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "utils.h"
+#include "title.h"
 
 typedef struct tMovieNode * tMovieList;
 
@@ -46,5 +47,17 @@ imdbADT newImdbADT(char ** genres, size_t qtyGenres) {
     imdb->qtyGenres = qtyGenres;
     imdb->firstY = NULL;
     return imdb;
+}
+
+void loadTitleByYear(imdbADT imdb, tTitle * t) { //QUERY 1
+
+}
+
+void loadTitleByTypeGenre(imdbADT imdb, tTitle * t) { //QUERY 2
+
+}
+
+void loadTopMovie(imdbADT imdb, tTitle * t) { //QUERY 3
+
 }
 

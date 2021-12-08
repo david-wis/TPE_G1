@@ -4,6 +4,8 @@
 
 #ifndef TPE_G1_CSVADT_H
 #define TPE_G1_CSVADT_H
+#include "title.h"
+
 typedef struct csvCDT * csvADT;
 
 csvADT newCsv(char * path, char * mode);

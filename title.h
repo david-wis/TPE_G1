@@ -10,7 +10,8 @@ typedef struct tTitle{
     char * id;
     char titleType;
     char * primaryTitle;
-    char * genres; //(0 a 31 para el genero) Vector dinamico de generos -1 terminated
+    // char * genres; //(0 a 31 para el genero) Vector dinamico de generos -1 terminated
+    unsigned int genres; // Se usa cada bit para un genero
     unsigned short startYear;
     unsigned short endYear;
     unsigned int runtimeMinutes;
