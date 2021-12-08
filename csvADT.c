@@ -75,6 +75,7 @@ static char * parseString(char * s) {
  * @param titleTypes: Vector NULL terminated con nombres de los tipos de titulos
  * @return
  */
+
 tTitle * readNextTitle(csvADT csv, char ** genres, char ** titleTypes) {
     tTitle * title = safeMalloc(sizeof(tTitle));
     char * line = readNextString(csv);
