@@ -19,4 +19,6 @@ typedef struct tTitle{
     float avgRating;
 } tTitle;
 
+void freeTitle(tTitle * t);
+
 #endif //TPE_G1_TITLE_H

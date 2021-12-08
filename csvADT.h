@@ -14,7 +14,7 @@ static char * readLine(FILE * f);
 
 char * readNextString(csvADT csv);
 
-tTitle * readNextTitle(csvADT csv, char ** genres, char ** titleTypes);
+tTitle * readNextTitle(csvADT csv, char ** genres, size_t genresDim, char * titleTypes[], size_t typesDim);
 
 int eof(csvADT csv);
 

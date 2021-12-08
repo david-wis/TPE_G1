@@ -11,6 +11,7 @@
 #define BUFFER_SIZE 256
 #define FILE_ERROR "Could not open file"
 #define DELIM ";"
+#define EMPTY "\\N"
 
 typedef struct csvCDT {
     FILE * file;
@@ -61,17 +62,49 @@ char * readNextString(csvADT csv) {
 }
 
 static unsigned long parseInt(char * s) { // TODO: Ver si conviene separarlo
-    return atol(strtok(s, DELIM));
+    char * token = strtok(s, DELIM);
+    if (strcmp(token, EMPTY) == 0)
+        return 0;
+    return atol(token);
 }
 
 static float parseFloat(char * s){
-    return atof(strtok(s, DELIM));
+    char * token = strtok(s, DELIM);
+    if (strcmp(token, EMPTY) == 0)
+        return 0.0f;
+    return atof(token);
 }
 
 static char * parseString(char * s) {
     char * token = strtok(s, DELIM);
+    if (strcmp(token, EMPTY) == 0)
+        return NULL;
     char * copy = safeMalloc(strlen(token) + 1);
     return strcpy(copy, token);
+}
+
+static char parseType(char * s, char * titleTypes[], size_t typesDim, int * error) { // Error devuelve 0 si no hay error y distinto de cero si hay
+    int cmp = -1;
+    char * token = strtok(s, DELIM), i;
+    for (i = 0; i < typesDim && (cmp = strcmp(token, titleTypes[i])) < 0; i++)  // Ver si conviene hacerlo generico en utils
+        ;
+    *error = cmp;
+    return i;
+}
+
+static unsigned int parseGenres(char * s, char ** genres, size_t genresDim) {
+    char * token = strtok(s, DELIM);
+    char * p;
+    unsigned int state = 0;
+    size_t len;
+    for (size_t i = 0; i < genresDim; ++i) { // TODO: Ver si se puede optimizar
+        p = strstr(token, genres[i]);
+        len = strlen(p);
+        if (p[len] == '\0' || p[len] == ',') {
+            state += 1<<i;
+        }
+    }
+    return state;
 }
 
 /*!
@@ -81,10 +114,33 @@ static char * parseString(char * s) {
  * @return
  */
 
-tTitle * readNextTitle(csvADT csv, char ** genres, char ** titleTypes) {
+tTitle * readNextTitle(csvADT csv, char ** genres, size_t genresDim,
+                       char * titleTypes[], size_t typesDim) {
     tTitle * title = safeMalloc(sizeof(tTitle));
     char * line = readNextString(csv);
-    char * token = strtok(line, DELIM);
+    int error;
+
+    title->id = parseString(line);
+
+    title->titleType = parseType(NULL, titleTypes, typesDim, &error);
+    if (error) {
+        free(title->id);
+        free(title);
+        return NULL;
+    }
+
+    title->primaryTitle = parseString(NULL);
+    title->startYear = parseInt(NULL);
+    title->endYear = parseInt(NULL);
+    title->genres = parseGenres(NULL, genres, genresDim);
+    title->avgRating = parseFloat(NULL);
+
+    title->numVotes = parseInt(NULL);
+    if(title->numVotes == 0){
+        freeTitle(title);
+        return NULL;
+    }
+
     title->runtimeMinutes = parseInt(NULL);
     return title;
 }

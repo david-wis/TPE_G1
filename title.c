@@ -8,6 +8,5 @@
 void freeTitle(tTitle * t) {
     free(t->id);
     free(t->primaryTitle);
-    free(t->genres);
     free(t);
 }
