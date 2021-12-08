@@ -6,7 +6,9 @@
 #include <stdlib.h>
 
 void freeTitle(tTitle * t) {
-    free(t->id);
-    free(t->primaryTitle);
+    if (t != NULL) {
+        free(t->id);
+        free(t->primaryTitle);
+    }
     free(t);
 }

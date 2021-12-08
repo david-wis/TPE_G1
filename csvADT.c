@@ -84,9 +84,9 @@ static char * parseString(char * s) {
 }
 
 static char parseType(char * s, char * titleTypes[], size_t typesDim, int * error) { // Error devuelve 0 si no hay error y distinto de cero si hay
-    int cmp = -1;
+    int cmp = 1;
     char * token = strtok(s, DELIM), i;
-    for (i = 0; i < typesDim && (cmp = strcmp(token, titleTypes[i])) < 0; i++)  // Ver si conviene hacerlo generico en utils
+    for (i = 0; i < typesDim && (cmp = strcmp(token, titleTypes[i])) > 0; i++)  // Ver si conviene hacerlo generico en utils
         ;
     *error = cmp;
     return i;
@@ -99,9 +99,11 @@ static unsigned int parseGenres(char * s, char ** genres, size_t genresDim) {
     size_t len;
     for (size_t i = 0; i < genresDim; ++i) { // TODO: Ver si se puede optimizar
         p = strstr(token, genres[i]);
-        len = strlen(p);
-        if (p[len] == '\0' || p[len] == ',') {
-            state += 1<<i;
+        if (p != NULL) {
+            len = strlen(p);
+            if (p[len] == '\0' || p[len] == ',') {
+                state |= 1<<i;
+            }
         }
     }
     return state;
@@ -116,8 +118,11 @@ static unsigned int parseGenres(char * s, char ** genres, size_t genresDim) {
 
 tTitle * readNextTitle(csvADT csv, char ** genres, size_t genresDim,
                        char * titleTypes[], size_t typesDim) {
-    tTitle * title = safeMalloc(sizeof(tTitle));
     char * line = readNextString(csv);
+    if (line == NULL)
+        return NULL;
+
+    tTitle * title = safeMalloc(sizeof(tTitle));
     int error;
 
     title->id = parseString(line);

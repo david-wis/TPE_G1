@@ -5,6 +5,7 @@
 #include "utils.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 
 #define ERR_MSG "Not enough memory"
 
@@ -31,4 +32,8 @@ void * safeRealloc(void * p, size_t bytes){
     void * m = realloc(p, bytes);
     checkInvalidMemory(m);
     return m;
+}
+
+float roundCent(float f) {
+    return floor( f * 100 + .5 ) / 100;
 }
