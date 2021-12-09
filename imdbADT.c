@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include "utils.h"
 #include "title.h"
+#define ERR_MSG_OOB "Out of bounds"
 
 typedef struct tMovieNode * tMovieList;
 
@@ -40,6 +41,7 @@ typedef struct imdbCDT {
     char ** genres;
     char qtyGenres;
     tYearList firstY;
+    tYearList iterYear;
 } imdbCDT;
 
 imdbADT newImdbADT(char ** genres, char qtyGenres) {
@@ -49,6 +51,7 @@ imdbADT newImdbADT(char ** genres, char qtyGenres) {
     imdb->firstY = NULL;
     return imdb;
 }
+
 static void freeMoviesRec(tMovieList movie) {
     if (movie == NULL)
         return;
@@ -69,6 +72,46 @@ static void freeYearsRec(tYearList years){
 void freeImdb(imdbADT imdb) {
     freeYearsRec(imdb->firstY);
     free(imdb);
+}
+
+void toBeginYear(imdbADT imdb){
+    imdb->iterYear = imdb->firstY;
+}
+
+int hasNextYear(imdbADT imdb){
+    return imdb->iterYear != NULL;
+}
+
+void nextYear(imdbADT imdb){
+    if(imdb->iterYear == NULL){
+        fprintf(stderr, ERR_MSG_OOB);
+        exit(1);
+    }
+    imdb->iterYear = imdb->iterYear->nextY;
+}
+
+unsigned long getQtyFilms(imdbADT imdb){
+    if(imdb->iterYear == NULL){
+        fprintf(stderr, ERR_MSG_OOB);
+        exit(1);
+    }
+    return imdb->iterYear->qtyFilms;
+}
+
+unsigned long getQtyShorts(imdbADT imdb){
+    if(imdb->iterYear == NULL){
+        fprintf(stderr, ERR_MSG_OOB);
+        exit(1);
+    }
+    return imdb->iterYear->qtyShorts;
+}
+
+unsigned long getQtySeries(imdbADT imdb){
+    if(imdb->iterYear == NULL){
+        fprintf(stderr, ERR_MSG_OOB);
+        exit(1);
+    }
+    return imdb->iterYear->qtySeries;
 }
 
 static void loadTitleByYear(tYearList year, tTitle * title) { //QUERY 1
@@ -127,3 +170,4 @@ void loadData(imdbADT imdb, tTitle * title) {
         loadTopMovie(pCurrYear, title);
     }
 }
+

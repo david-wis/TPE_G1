@@ -15,4 +15,16 @@ void loadData(imdbADT imdb, tTitle * title);
 
 void freeImdb(imdbADT imdb);
 
+void toBeginYear(imdbADT imdb);
+
+int hasNextYear(imdbADT imdb);
+
+void nextYear(imdbADT imdb);
+
+unsigned long getQtyFilms(imdbADT imdb);
+
+unsigned long getQtyShorts(imdbADT imdb);
+
+unsigned long getQtySeries(imdbADT imdb);
+
 #endif //TPE_G1_IMDBADT_H
