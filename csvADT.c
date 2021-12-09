@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 #include "csvADT.h"
 #include "utils.h"
 #include "title.h"
@@ -16,6 +17,7 @@
 typedef struct csvCDT {
     FILE * file;
     size_t line;
+    char * mode;
 } csvCDT;
 
 static char * readLine(FILE * f) {
@@ -39,6 +41,7 @@ static char * readLine(FILE * f) {
 csvADT newCsv(char * path, char * mode) {
     csvADT csv = safeMalloc(sizeof(csvCDT));
     csv->file = fopen(path, mode);
+    csv->mode = mode;
     if (csv->file == NULL) {
         fprintf(stderr, FILE_ERROR);
         exit(1);
@@ -136,6 +139,11 @@ tTitle * readNextTitle(csvADT csv, char ** genres, size_t genresDim,
 
     title->primaryTitle = parseString(NULL);
     title->startYear = parseInt(NULL);
+    if (title->startYear == 0)  {
+        freeTitle(title);
+        return NULL;
+    }
+
     title->endYear = parseInt(NULL);
     title->genres = parseGenres(NULL, genres, genresDim);
     title->avgRating = parseFloat(NULL);
@@ -152,4 +160,12 @@ tTitle * readNextTitle(csvADT csv, char ** genres, size_t genresDim,
 
 int eof(csvADT csv) {
      return feof(csv->file);
+}
+
+void writeQuery1(csvADT csv, unsigned short year, unsigned long films, unsigned long series, unsigned long shorts) {
+    fprintf(csv->file, "%d;%lu;%lu;%lu\n", year, films, series, shorts);
+}
+
+void writeString(csvADT csv, const char * txt) {
+    fprintf(csv->file, "%s\n", txt);
 }
