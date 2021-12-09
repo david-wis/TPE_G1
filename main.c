@@ -6,7 +6,7 @@
 #define QTY_GENRES 32
 #define WRONG_PARAMS "Two arguments were expected"
 
-void loadGenres(char * fileName, char * vecGenres[], size_t * genreDim);
+void loadGenres(char * fileName, char * vecGenres[], char * genreDim);
 
 int main(int argc, char * argv[]) {
     #ifdef RELEASE
@@ -36,7 +36,9 @@ int main(int argc, char * argv[]) {
             freeTitle(title);
         }
     }
+    closeFile(csvTitles);
     // TODO: escritura de csv
+    freeImdb(imdb);
     return 0;
 }
 

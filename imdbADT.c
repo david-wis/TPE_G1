@@ -15,7 +15,7 @@ typedef struct tMovieNode {
     char * film;
     unsigned long votes;
     float rating;
-    signed char * genres; // Vector -1 terminated de generos
+    unsigned int genres;
     tMovieList nextM;
 } tMovieNode;
 
@@ -47,6 +47,27 @@ imdbADT newImdbADT(char ** genres, size_t qtyGenres) {
     imdb->qtyGenres = qtyGenres;
     imdb->firstY = NULL;
     return imdb;
+}
+static void freeMoviesRec(tMovieList movie) {
+    if (movie == NULL)
+        return;
+    freeMoviesRec(movie->nextM);
+    free(movie->film);
+    free(movie);
+}
+
+static void freeYearsRec(tYearList years){
+    if(years == NULL)
+        return;
+    freeMoviesRec(years->firstM);
+    free(years->qtyByGenre);
+    freeYearsRec(years->nextY);
+    free(years);
+}
+
+void freeImdb(imdbADT imdb) {
+    freeYearsRec(imdb->firstY);
+    free(imdb);
 }
 
 void loadTitleByYear(imdbADT imdb, tTitle * t) { //QUERY 1
