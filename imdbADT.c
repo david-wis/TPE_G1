@@ -37,6 +37,7 @@ typedef struct tYearNode {
     tGenreQtys * qtyByGenre; // Vector de genero
     char topSize;
     tMovieList firstM;
+    tMovieList iterMovie;
     tYearList nextY;
 } tYearNode;
 
@@ -52,7 +53,72 @@ imdbADT newImdbADT(char ** genres, char qtyGenres) {
     imdb->genres = genres;
     imdb->qtyGenres = qtyGenres;
     imdb->firstY = NULL;
+    imdb->iterYear = NULL;
     return imdb;
+}
+
+static void checkIterInBounds(imdbADT imdb, int checkIterMovie) {
+    if(imdb->iterYear == NULL || (checkIterMovie && imdb->iterYear->iterMovie == NULL)){
+        fprintf(stderr, ERR_MSG_OOB);
+        exit(1);
+    }
+}
+
+//ITERADOR DE PELICULAS POR CADA AÑO
+void toBeginMovie(imdbADT imdb){
+    checkIterInBounds(imdb, 0);
+    imdb->iterYear->iterMovie = imdb->iterYear->firstM;
+}
+
+int hasNextMovie(imdbADT imdb){
+    checkIterInBounds(imdb, 0);
+    return imdb->iterYear->iterMovie != NULL;
+}
+
+void nextMovie(imdbADT imdb){
+    checkIterInBounds(imdb, 1);
+    imdb->iterYear->iterMovie = imdb->iterYear->iterMovie->nextM;
+}
+
+// Pelicula votos rating y generos
+char * getCurrentMovieTitle(imdbADT imdb) {
+    checkIterInBounds(imdb, 1);
+    return imdb->iterYear->iterMovie->film;
+}
+
+unsigned long getCurrentMovieVotes(imdbADT imdb){
+    checkIterInBounds(imdb, 1);
+    return imdb->iterYear->iterMovie->votes;
+}
+
+float getCurrentMovieRaiting(imdbADT imdb){
+    checkIterInBounds(imdb, 1);
+    return imdb->iterYear->iterMovie->rating;
+}
+
+char * getCurrentMovieGenres(imdbADT imdb){
+    checkIterInBounds(imdb, 1);
+    char * s = NULL;
+    size_t len = 0;
+    size_t wordlen;
+    unsigned int genres = imdb->iterYear->iterMovie->genres;
+    if (!genres) {
+        s = safeMalloc(3);
+        strcpy(s, "\\N");
+        return s;
+    }
+    for (int i = 0; i < imdb->qtyGenres; i++) {
+        if (genres & 1 << i) {
+            wordlen = strlen(imdb->genres[i]);
+            s = safeRealloc(s, len + wordlen + 2);
+            strcpy(s + len, imdb->genres[i]);
+            s[len + wordlen] = ',';
+            len += (wordlen + 1);
+        }
+    }
+    s = safeRealloc(s, len);
+    s[len-1] = 0;
+    return s;
 }
 
 static void freeMoviesRec(tMovieList movie) {
@@ -77,6 +143,7 @@ void freeImdb(imdbADT imdb) {
     free(imdb);
 }
 
+//ITERADOR DE AÑOS
 void toBeginYear(imdbADT imdb){
     imdb->iterYear = imdb->firstY;
 }
@@ -86,38 +153,27 @@ int hasNextYear(imdbADT imdb){
 }
 
 void nextYear(imdbADT imdb){
-    if(imdb->iterYear == NULL){
-        fprintf(stderr, ERR_MSG_OOB);
-        exit(1);
-    }
+    checkIterInBounds(imdb, 0);
     imdb->iterYear = imdb->iterYear->nextY;
 }
 
 unsigned int getCurrentYear(imdbADT imdb){
+    checkIterInBounds(imdb, 0);
     return imdb->iterYear->year;
 }
 
 unsigned long getQtyFilms(imdbADT imdb){
-    if(imdb->iterYear == NULL){
-        fprintf(stderr, ERR_MSG_OOB);
-        exit(1);
-    }
+    checkIterInBounds(imdb, 0);
     return imdb->iterYear->qtyFilms;
 }
 
 unsigned long getQtyShorts(imdbADT imdb){
-    if(imdb->iterYear == NULL){
-        fprintf(stderr, ERR_MSG_OOB);
-        exit(1);
-    }
+    checkIterInBounds(imdb, 0);
     return imdb->iterYear->qtyShorts;
 }
 
 unsigned long getQtySeries(imdbADT imdb){
-    if(imdb->iterYear == NULL){
-        fprintf(stderr, ERR_MSG_OOB);
-        exit(1);
-    }
+    checkIterInBounds(imdb, 0);
     return imdb->iterYear->qtySeries;
 }
 
@@ -140,7 +196,7 @@ static void loadTitleByYear(tYearList year, tTitle * title) { //QUERY 1
 
 static void loadTitleByTypeGenre(tYearList year, tTitle * title, char qtyGenres) { //QUERY 2
     for (int i = 0; i < qtyGenres; i++) {
-        if((title->genres & 1<<i)>>i == 1){
+        if((title->genres & 1 << i) >> i == 1){
             year->qtyByGenre[i].qtySeries += (title->titleType == TVMINISERIES || title->titleType == TVSERIES);
             year->qtyByGenre[i].qtyFilms += title->titleType == MOVIE;
         }
@@ -158,7 +214,7 @@ static tMovieList addTopMovieRec(tMovieList list, tTitle * title) {
     int cmp;
     if (list == NULL || (cmp = compareMovies(title, list)) <= 0) {
         tMovieList m = safeMalloc(sizeof(tMovieNode));
-        m->film = malloc(strlen(title->primaryTitle) + 1);
+        m->film = safeMalloc(strlen(title->primaryTitle) + 1);
         strcpy(m->film, title->primaryTitle);
         m->votes = title->numVotes;
         m->genres = title->genres;
@@ -193,6 +249,7 @@ static tYearList insertYearRec(tYearList node, unsigned short year, tYearList * 
         new->qtyFilms = new->qtySeries = new->qtyShorts = 0;
         new->nextY = node;
         new->topSize = 0;
+        new->iterMovie = NULL;
         *result = new;
         return new;
     }

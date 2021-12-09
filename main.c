@@ -8,9 +8,11 @@
 #define READ "r"
 #define WRITE "w"
 #define QUERY1_HEADERS "year;films;series;shorts"
+#define QUERY3_HEADERS "year;film;votes;rating;genres"
 
 void loadGenres(char * fileName, char * vecGenres[], char * genreDim);
 void writeResults(imdbADT imdb);
+void writeMoviesRec(imdbADT imdb, unsigned short year, csvADT csv);
 
 int main(int argc, char * argv[]) {
     #ifdef RELEASE
@@ -23,10 +25,10 @@ int main(int argc, char * argv[]) {
     char * titleTypes[] = {"movie", "short", "tvMiniSeries", "tvSeries"};
     char genreDim;
     char * vecGenres[QTY_GENRES];
-    loadGenres("/Users/mbp13/Desktop/PI/TPE_G1/genres.csv", vecGenres, &genreDim); //TODO: Ponerlo con argv
+    loadGenres("/home/david/Desktop/TPE-G1/genres.csv", vecGenres, &genreDim); //TODO: Ponerlo con argv
 
     imdbADT imdb = newImdbADT(vecGenres, genreDim);
-    csvADT csvTitles = newCsv("/Users/mbp13/Desktop/PI/TPE_G1/imdb.csv", READ); //TODO: Ponerlo con argv
+    csvADT csvTitles = newCsv("/home/david/Desktop/TPE-G1/imdb.csv", READ); //TODO: Ponerlo con argv
     tTitle * title;
     while (!eof(csvTitles)) {
         title = readNextTitle(csvTitles, vecGenres, genreDim, titleTypes, sizeof(titleTypes)/sizeof(char*));
@@ -37,7 +39,6 @@ int main(int argc, char * argv[]) {
     }
     closeFile(csvTitles);
     writeResults(imdb);
-    // TODO: escritura de csv
     freeImdb(imdb);
     return 0;
 }
@@ -51,12 +52,35 @@ void loadGenres(char * fileName, char * vecGenres[], char * genreDim) {
     closeFile(genresCsv);
 }
 
+void writeMoviesRec(imdbADT imdb, unsigned short year, csvADT csv) {
+    if (!hasNextMovie(imdb))
+        return;
+    char * title = getCurrentMovieTitle(imdb);
+    unsigned long votes = getCurrentMovieVotes(imdb);
+    float rating = getCurrentMovieRaiting(imdb);
+    char * genres = getCurrentMovieGenres(imdb);
+    nextMovie(imdb);
+    writeMoviesRec(imdb, year, csv);
+    writeQuery3(csv, year, title, votes, rating, genres);
+}
+
 void writeResults(imdbADT imdb){
     toBeginYear(imdb);
-    csvADT query1File = newCsv("/Users/mbp13/Desktop/PI/TPE_G1/query1.csv", WRITE);
+    csvADT query1File = newCsv("/home/david/Desktop/TPE-G1/query1.csv", WRITE);
+    csvADT query3File = newCsv("/home/david/Desktop/TPE-G1/query3.csv", WRITE);
     writeString(query1File, QUERY1_HEADERS);
+    writeString(query3File, QUERY3_HEADERS);
     while (hasNextYear(imdb)){
-        writeQuery1(query1File, getCurrentYear(imdb), getQtyFilms(imdb), getQtyShorts(imdb), getQtySeries(imdb));
+        unsigned short year = getCurrentYear(imdb);
+
+        //Query 1
+        writeQuery1(query1File, year, getQtyFilms(imdb), getQtyShorts(imdb), getQtySeries(imdb));
+
+        //Query 2
+
+        // Query 3
+        toBeginMovie(imdb);
+        writeMoviesRec(imdb, year, query3File);
         nextYear(imdb);
     }
 }

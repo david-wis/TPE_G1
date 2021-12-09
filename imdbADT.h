@@ -29,4 +29,19 @@ unsigned long getQtySeries(imdbADT imdb);
 
 unsigned int getCurrentYear(imdbADT imdb);
 
+void toBeginMovie(imdbADT imdb);
+
+int hasNextMovie(imdbADT imdb);
+
+void nextMovie(imdbADT imdb);
+
+char * getCurrentMovieTitle(imdbADT imdb);
+
+unsigned long getCurrentMovieVotes(imdbADT imdb);
+
+float getCurrentMovieRaiting(imdbADT imdb);
+
+char * getCurrentMovieGenres(imdbADT imdb);
+
+
 #endif //TPE_G1_IMDBADT_H

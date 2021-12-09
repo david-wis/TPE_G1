@@ -22,4 +22,6 @@ void writeString(csvADT csv, const char * txt);
 
 void writeQuery1(csvADT csv, unsigned short year, unsigned long films, unsigned long series, unsigned long shorts);
 
+void writeQuery3(csvADT csv, unsigned short year, char * title, unsigned long votes, float rating, char * genres);
+
 #endif //TPE_G1_CSVADT_H

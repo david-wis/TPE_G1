@@ -166,6 +166,10 @@ void writeQuery1(csvADT csv, unsigned short year, unsigned long films, unsigned 
     fprintf(csv->file, "%d;%lu;%lu;%lu\n", year, films, series, shorts);
 }
 
+void writeQuery3(csvADT csv, unsigned short year, char * title, unsigned long votes, float rating, char * genres) {
+    fprintf(csv->file, "%d;%s;%lu;%0.2f;%s\n", year, title, votes, rating, genres);
+}
+
 void writeString(csvADT csv, const char * txt) {
     fprintf(csv->file, "%s\n", txt);
 }
