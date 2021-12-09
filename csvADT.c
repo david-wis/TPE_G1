@@ -10,7 +10,7 @@
 #include "utils.h"
 #include "title.h"
 #define BUFFER_SIZE 256
-#define FILE_ERROR "Could not open file"
+#define FILE_ERROR "Could not open file\n"
 #define DELIM ";"
 #define EMPTY "\\N"
 
@@ -137,6 +137,7 @@ tTitle * readNextTitle(csvADT csv, char ** genres, size_t genresDim,
     if (error) {
         free(title->id);
         free(title);
+        free(line);
         return NULL;
     }
 
@@ -144,20 +145,24 @@ tTitle * readNextTitle(csvADT csv, char ** genres, size_t genresDim,
     title->startYear = parseInt(NULL);
     if (title->startYear == 0)  {
         freeTitle(title);
+        free(line);
         return NULL;
     }
 
     title->endYear = parseInt(NULL);
     title->genres = parseGenres(NULL, genres, genresDim);
     title->avgRating = parseFloat(NULL);
-
     title->numVotes = parseInt(NULL);
+
     if(title->numVotes == 0){
         freeTitle(title);
+        free(line);
         return NULL;
     }
 
     title->runtimeMinutes = parseInt(NULL);
+    free(line);
+
     return title;
 }
 
