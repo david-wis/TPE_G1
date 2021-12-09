@@ -72,7 +72,20 @@ void freeImdb(imdbADT imdb) {
 }
 
 static void loadTitleByYear(tYearList year, tTitle * title) { //QUERY 1
-
+    switch (title->titleType) {
+        case MOVIE:
+            year->qtyFilms++;
+            break;
+        case SHORT:
+            year->qtyShorts++;
+            break;
+        case TVMINISERIES:
+        case TVSERIES:
+            year->qtySeries++;
+            break;
+        default:
+            break;
+    }
 }
 
 static void loadTitleByTypeGenre(tYearList year, tTitle * title, char qtyGenres) { //QUERY 2
@@ -110,7 +123,7 @@ void loadData(imdbADT imdb, tTitle * title) {
     loadTitleByTypeGenre(pCurrYear, title, imdb->qtyGenres);
 
     if (title->titleType == MOVIE) {
-        printf("%s:%d\n", title->primaryTitle, title->startYear);
+        //printf("%s:%d\n", title->primaryTitle, title->startYear);
         loadTopMovie(pCurrYear, title);
     }
 }

@@ -19,10 +19,10 @@ int main(int argc, char * argv[]) {
     char * titleTypes[] = {"movie", "short", "tvMiniSeries", "tvSeries"};
     char genreDim;
     char * vecGenres[QTY_GENRES];
-    loadGenres("/home/jonyloco/CLionProjects/pi/TPE_G1/genres.csv", vecGenres, &genreDim); //TODO: Ponerlo con argv
+    loadGenres("/Users/mbp13/Desktop/PI/TPE_G1/genres.csv", vecGenres, &genreDim); //TODO: Ponerlo con argv
 
     imdbADT imdb = newImdbADT(vecGenres, genreDim);
-    csvADT csvTitles = newCsv("/home/jonyloco/CLionProjects/pi/TPE_G1/imdb.csv", "r"); //TODO: Ponerlo con argv
+    csvADT csvTitles = newCsv("//Users/mbp13/Desktop/PI/TPE_G1/imdb.csv", "r"); //TODO: Ponerlo con argv
     tTitle * title;
     while (!eof(csvTitles)) {
         title = readNextTitle(csvTitles, vecGenres, genreDim, titleTypes, sizeof(titleTypes)/sizeof(char*));
