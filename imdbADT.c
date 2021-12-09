@@ -74,7 +74,7 @@ void toBeginMovie(imdbADT imdb){
     imdb->iterYear->iterMovie = imdb->iterYear->firstM;
 }
 
-int hasNextMovie(imdbADT imdb){
+int hasNextMovie(imdbADT imdb) {
     checkIterInBounds(imdb, 0);
     return imdb->iterYear->iterMovie != NULL;
 }

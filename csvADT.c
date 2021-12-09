@@ -31,8 +31,11 @@ static char * readLine(FILE * f) {
            c = safeRealloc(c, len + BUFFER_SIZE);
        }
     } while(p != NULL && len > 0 && c[len-1] != '\n');
-    if (!len)
+    if (!len) {
+        free(c);
         return NULL;
+    }
+    c = safeRealloc(c, len);
     if (c[len-1]=='\n')
         c[len-1] = 0;
     return c;
@@ -86,9 +89,9 @@ static char * parseString(char * s) {
     return strcpy(copy, token);
 }
 
-static char parseType(char * s, char * titleTypes[], size_t typesDim, int * error) { // Error devuelve 0 si no hay error y distinto de cero si hay
-    int cmp = 1;
-    char * token = strtok(s, DELIM), i;
+static int parseType(char * s, char * titleTypes[], size_t typesDim, int * error) { // Error devuelve 0 si no hay error y distinto de cero si hay
+    int cmp = 1, i;
+    char * token = strtok(s, DELIM);
     for (i = 0; i < typesDim && (cmp = strcmp(token, titleTypes[i])) > 0; i++)  // Ver si conviene hacerlo generico en utils
         ;
     *error = cmp;
