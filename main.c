@@ -5,6 +5,9 @@
 
 #define QTY_GENRES 32
 #define WRONG_PARAMS "Two arguments were expected"
+#define READ "r"
+#define WRITE "w"
+#define QUERY1_HEADERS "year;films;series;shorts"
 
 void loadGenres(char * fileName, char * vecGenres[], char * genreDim);
 void writeResults(imdbADT imdb);
@@ -23,7 +26,7 @@ int main(int argc, char * argv[]) {
     loadGenres("/Users/mbp13/Desktop/PI/TPE_G1/genres.csv", vecGenres, &genreDim); //TODO: Ponerlo con argv
 
     imdbADT imdb = newImdbADT(vecGenres, genreDim);
-    csvADT csvTitles = newCsv("//Users/mbp13/Desktop/PI/TPE_G1/imdb.csv", "r"); //TODO: Ponerlo con argv
+    csvADT csvTitles = newCsv("/Users/mbp13/Desktop/PI/TPE_G1/imdb.csv", READ); //TODO: Ponerlo con argv
     tTitle * title;
     while (!eof(csvTitles)) {
         title = readNextTitle(csvTitles, vecGenres, genreDim, titleTypes, sizeof(titleTypes)/sizeof(char*));
@@ -40,7 +43,7 @@ int main(int argc, char * argv[]) {
 }
 
 void loadGenres(char * fileName, char * vecGenres[], char * genreDim) {
-    csvADT genresCsv = newCsv(fileName, "r");
+    csvADT genresCsv = newCsv(fileName, READ);
     int i = 0;
     while (i < QTY_GENRES && !eof(genresCsv))
         vecGenres[i++] = readNextString(genresCsv);
@@ -50,8 +53,11 @@ void loadGenres(char * fileName, char * vecGenres[], char * genreDim) {
 
 void writeResults(imdbADT imdb){
     toBeginYear(imdb);
+    csvADT query1File = newCsv("/Users/mbp13/Desktop/PI/TPE_G1/query1.csv", WRITE);
+    writeString(query1File, QUERY1_HEADERS);
     while (hasNextYear(imdb)){
-        printf("%d - %lu - %lu - %lu\n", getCurrentYear(imdb), getQtyFilms(imdb), getQtyShorts(imdb), getQtySeries(imdb));
+        writeQuery1(query1File, getCurrentYear(imdb), getQtyFilms(imdb), getQtyShorts(imdb), getQtySeries(imdb));
         nextYear(imdb);
     }
 }
+

@@ -18,4 +18,8 @@ int eof(csvADT csv);
 
 void closeFile(csvADT csv);
 
+void writeString(csvADT csv, const char * txt);
+
+void writeQuery1(csvADT csv, unsigned short year, unsigned long films, unsigned long series, unsigned long shorts);
+
 #endif //TPE_G1_CSVADT_H
