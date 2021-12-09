@@ -14,22 +14,21 @@
 void loadGenres(char * fileName, char * vecGenres[], char * genreDim);
 void writeResults(imdbADT imdb, char qtyGenres, char ** genres);
 void writeMoviesRec(imdbADT imdb, unsigned short year, csvADT csv);
+void freeGenres(char ** genres, char genreDim);
 
 int main(int argc, char * argv[]) {
-    #ifdef RELEASE
-    if (argc != 2) {
+    if (argc < QTY_PARAMS) {
         fprintf(stderr, WRONG_PARAMS);
         exit(1);
     }
-    #endif
 
     char * titleTypes[] = {"movie", "short", "tvMiniSeries", "tvSeries"};
     char genreDim;
     char * vecGenres[QTY_GENRES];
-    loadGenres("/home/jonyloco/CLionProjects/pi/TPE_G1/genres.csv", vecGenres, &genreDim); //TODO: Ponerlo con argv
+    loadGenres(argv[1], vecGenres, &genreDim); //TODO: Ponerlo con argv
 
     imdbADT imdb = newImdbADT(vecGenres, genreDim);
-    csvADT csvTitles = newCsv("/home/jonyloco/CLionProjects/pi/TPE_G1/imdb.csv", READ); //TODO: Ponerlo con argv
+    csvADT csvTitles = newCsv(argv[2], READ); //TODO: Ponerlo con argv
     tTitle * title;
     size_t typesDim = sizeof(titleTypes)/sizeof(char*);
     while (!eof(csvTitles)) {
@@ -42,6 +41,7 @@ int main(int argc, char * argv[]) {
     closeFile(csvTitles);
     writeResults(imdb, genreDim, vecGenres);
     freeImdb(imdb);
+    freeGenres(vecGenres, genreDim);
     return 0;
 }
 
@@ -64,13 +64,14 @@ void writeMoviesRec(imdbADT imdb, unsigned short year, csvADT csv) {
     nextMovie(imdb);
     writeMoviesRec(imdb, year, csv);
     writeQuery3(csv, year, title, votes, rating, genres);
+    free(genres);
 }
 
 void writeResults(imdbADT imdb, char qtyGenres, char ** genres){
     toBeginYear(imdb);
-    csvADT query1File = newCsv("/home/jonyloco/CLionProjects/pi/TPE_G1/query1.csv", WRITE);
-    csvADT query2File = newCsv("/home/jonyloco/CLionProjects/pi/TPE_G1/query2.csv", WRITE);
-    csvADT query3File = newCsv("/home/jonyloco/CLionProjects/pi/TPE_G1/query3.csv", WRITE);
+    csvADT query1File = newCsv(QUERY1_FILE, WRITE);
+    csvADT query2File = newCsv(QUERY2_FILE, WRITE);
+    csvADT query3File = newCsv(QUERY3_FILE, WRITE);
     writeString(query1File, QUERY1_HEADERS);
     writeString(query2File, QUERY2_HEADERS);
     writeString(query3File, QUERY3_HEADERS);
