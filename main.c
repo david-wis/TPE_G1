@@ -3,16 +3,19 @@
 #include "imdbADT.h"
 
 #define QTY_GENRES 32
-#define WRONG_PARAMS "Two arguments were expected"
+#define WRONG_PARAMS "Two arguments were expected\n"
 #define READ "r"
 #define WRITE "w"
 #define QUERY1_HEADERS "year;films;series;shorts"
 #define QUERY2_HEADERS "year;genre;films;series"
 #define QUERY3_HEADERS "year;film;votes;rating;genres"
-
+#define QUERY1_FILE "query1.csv"
+#define QUERY2_FILE "query2.csv"
+#define QUERY3_FILE "query3.csv"
+#define QTY_PARAMS 3
 
 void loadGenres(char * fileName, char * vecGenres[], char * genreDim);
-void writeResults(imdbADT imdb, char qtyGenres, char ** genres);
+void writeResults(imdbADT imdb, char genreDim, char ** genres);
 void writeMoviesRec(imdbADT imdb, unsigned short year, csvADT csv);
 void freeGenres(char ** genres, char genreDim);
 
@@ -54,6 +57,11 @@ void loadGenres(char * fileName, char * vecGenres[], char * genreDim) {
     closeFile(genresCsv);
 }
 
+void freeGenres(char ** genres, char genreDim){
+    for(int i = 0; i < genreDim; i++)
+        free(genres[i]);
+}
+
 void writeMoviesRec(imdbADT imdb, unsigned short year, csvADT csv) {
     if (!hasNextMovie(imdb))
         return;
@@ -67,7 +75,7 @@ void writeMoviesRec(imdbADT imdb, unsigned short year, csvADT csv) {
     free(genres);
 }
 
-void writeResults(imdbADT imdb, char qtyGenres, char ** genres){
+void writeResults(imdbADT imdb, char genreDim, char ** genres){
     toBeginYear(imdb);
     csvADT query1File = newCsv(QUERY1_FILE, WRITE);
     csvADT query2File = newCsv(QUERY2_FILE, WRITE);
@@ -82,7 +90,7 @@ void writeResults(imdbADT imdb, char qtyGenres, char ** genres){
         writeQuery1(query1File, year, getQtyFilms(imdb), getQtySeries(imdb), getQtyShorts(imdb));
 
         //Query 2
-        writeQuery2(query2File, year, qtyGenres, genres, getQtyByGenresByYear(imdb));
+        writeQuery2(query2File, year, genreDim, genres, getQtyByGenresByYear(imdb));
 
         // Query 3
         toBeginMovie(imdb);

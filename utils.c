@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <math.h>
 
-#define ERR_MSG "Not enough memory"
+#define ERR_MSG "Not enough memory\n"
 
 static void checkInvalidMemory(void * m) {
     if (m == NULL) {

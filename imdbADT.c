@@ -9,7 +9,7 @@
 #include <string.h>
 #include "utils.h"
 #include "title.h"
-#define ERR_MSG_OOB "Out of bounds"
+#define ERR_MSG_OOB "Out of bounds\n"
 #define MAX_MOVIE_COUNT 5
 
 typedef struct tMovieNode * tMovieList;
