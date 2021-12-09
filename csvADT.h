@@ -10,8 +10,6 @@ typedef struct csvCDT * csvADT;
 
 csvADT newCsv(char * path, char * mode);
 
-static char * readLine(FILE * f);
-
 char * readNextString(csvADT csv);
 
 tTitle * readNextTitle(csvADT csv, char ** genres, size_t genresDim, char * titleTypes[], size_t typesDim);

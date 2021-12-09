@@ -19,23 +19,24 @@ int main(int argc, char * argv[]) {
     char * titleTypes[] = {"movie", "short", "tvMiniSeries", "tvSeries"};
     size_t genreDim;
     char * vecGenres[QTY_GENRES];
-    loadGenres("/home/david/Desktop/TPE-G1/genres.csv", vecGenres, &genreDim); //TODO: Ponerlo con argv
+    loadGenres("/home/jonyloco/CLionProjects/pi/TPE_G1/genres.csv", vecGenres, &genreDim); //TODO: Ponerlo con argv
 
     imdbADT imdb = newImdbADT(vecGenres, genreDim);
-    csvADT csvTitles = newCsv("/home/david/Desktop/TPE-G1/imdb.csv", "r"); //TODO: Ponerlo con argv
+    csvADT csvTitles = newCsv("/home/jonyloco/CLionProjects/pi/TPE_G1/imdb.csv", "r"); //TODO: Ponerlo con argv
     tTitle * title;
     while (!eof(csvTitles)) {
         title = readNextTitle(csvTitles, vecGenres, genreDim, titleTypes, sizeof(titleTypes)/sizeof(char*));
         if (title != NULL) {
             loadTitleByYear(imdb, title);
             loadTitleByTypeGenre(imdb, title);
-            if (!title->titleType) {
-                //printf("%s:%d\n", title->primaryTitle, title->startYear);
+            if (title->titleType == MOVIE) {
+                printf("%s:%d\n", title->primaryTitle, title->startYear);
                 loadTopMovie(imdb, title);
             }
             freeTitle(title);
         }
     }
+    // TODO: escritura de csv
     return 0;
 }
 
