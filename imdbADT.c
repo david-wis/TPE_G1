@@ -6,8 +6,10 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "utils.h"
 #include "title.h"
+#define MAX_MOVIE_COUNT 5
 
 typedef struct tMovieNode * tMovieList;
 
@@ -32,6 +34,7 @@ typedef struct tYearNode {
     unsigned long qtySeries;
     unsigned long qtyShorts;
     tGenreQtys * qtyByGenre; // Vector de genero
+    char topSize;
     tMovieList firstM;
     tYearList nextY;
 } tYearNode;
@@ -79,8 +82,41 @@ static void loadTitleByTypeGenre(tYearList year, tTitle * title, char qtyGenres)
 
 }
 
-static void loadTopMovie(tYearList year, tTitle * title) { //QUERY 3
+static int compareMovies(tTitle * title, tMovieNode * movie) {
+    int aux = (title->numVotes > movie->votes) - (title->numVotes < movie->votes);
+    if (!aux)
+        aux = strcmp(movie->film, title->primaryTitle);
+    return aux;
+}
 
+static tMovieList addTopMovieRec(tMovieList list, tTitle * title) {
+    int cmp;
+    if (list == NULL || (cmp = compareMovies(title, list)) <= 0) {
+        tMovieList m = safeMalloc(sizeof(tMovieNode));
+        m->film = malloc(strlen(title->primaryTitle) + 1);
+        strcpy(m->film, title->primaryTitle);
+        m->votes = title->numVotes;
+        m->genres = title->genres;
+        m->rating = title->avgRating;
+        m->nextM = list;
+        return m;
+    }
+    if (cmp > 0)
+        list->nextM = addTopMovieRec(list->nextM, title);
+    return list;
+}
+
+static void loadTopMovie(tYearList year, tTitle * title) { //QUERY 3
+    if (year->topSize < MAX_MOVIE_COUNT) { // Si hay menos de 5 peliculas, se guarda siempre como maximo
+        year->firstM = addTopMovieRec(year->firstM, title);
+        year->topSize++;
+    } else if (compareMovies(title, year->firstM) > 0) { // Si hay 5 y es mayor al primero, se borra el menor y se guarda
+        tMovieList aux = year->firstM->nextM;
+        free(year->firstM->film);
+        free(year->firstM);
+        year->firstM = aux;
+        year->firstM = addTopMovieRec(year->firstM, title);
+    }
 }
 
 static tYearList insertYearRec(tYearList node, unsigned short year, tYearList * result, char qtyGenres) {
@@ -91,6 +127,7 @@ static tYearList insertYearRec(tYearList node, unsigned short year, tYearList * 
         new->qtyByGenre = safeCalloc(qtyGenres, sizeof(tGenreQtys));
         new->qtyFilms = new->qtySeries = new->qtyShorts = 0;
         new->nextY = node;
+        new->topSize = 0;
         *result = new;
         return new;
     }
