@@ -132,7 +132,12 @@ static void loadTitleByYear(tYearList year, tTitle * title) { //QUERY 1
 }
 
 static void loadTitleByTypeGenre(tYearList year, tTitle * title, char qtyGenres) { //QUERY 2
-
+    for (int i = 0; i < qtyGenres; i++) {
+        if((title->genres & 1<<i)>>i == 1){
+            year->qtyByGenre[i].qtySeries += (title->titleType == TVMINISERIES || title->titleType == TVSERIES);
+            year->qtyByGenre[i].qtyFilms += title->titleType == MOVIE;
+        }
+    }
 }
 
 static void loadTopMovie(tYearList year, tTitle * title) { //QUERY 3
