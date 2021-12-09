@@ -11,7 +11,7 @@
 
 static void checkInvalidMemory(void * m) {
     if (m == NULL) {
-        fprintf(stderr, ERR_MSG);
+        perror(ERR_MSG);
         exit(1);
     }
 }
@@ -32,8 +32,4 @@ void * safeRealloc(void * p, size_t bytes){
     void * m = realloc(p, bytes);
     checkInvalidMemory(m);
     return m;
-}
-
-float roundCent(float f) {
-    return floor( f * 100 + .5 ) / 100;
 }

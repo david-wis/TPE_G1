@@ -10,6 +10,7 @@
 #define QUERY1_HEADERS "year;films;series;shorts"
 #define QUERY3_HEADERS "year;film;votes;rating;genres"
 
+
 void loadGenres(char * fileName, char * vecGenres[], char * genreDim);
 void writeResults(imdbADT imdb);
 void writeMoviesRec(imdbADT imdb, unsigned short year, csvADT csv);
@@ -67,6 +68,7 @@ void writeMoviesRec(imdbADT imdb, unsigned short year, csvADT csv) {
 void writeResults(imdbADT imdb){
     toBeginYear(imdb);
     csvADT query1File = newCsv("/home/david/Desktop/TPE-G1/query1.csv", WRITE);
+    csvADT query2File = newCsv("/home/david/Desktop/TPE-G1/query2.csv", WRITE);
     csvADT query3File = newCsv("/home/david/Desktop/TPE-G1/query3.csv", WRITE);
     writeString(query1File, QUERY1_HEADERS);
     writeString(query3File, QUERY3_HEADERS);
@@ -74,7 +76,7 @@ void writeResults(imdbADT imdb){
         unsigned short year = getCurrentYear(imdb);
 
         //Query 1
-        writeQuery1(query1File, year, getQtyFilms(imdb), getQtyShorts(imdb), getQtySeries(imdb));
+        writeQuery1(query1File, year, getQtyFilms(imdb), getQtySeries(imdb), getQtyShorts(imdb));
 
         //Query 2
 
@@ -83,5 +85,8 @@ void writeResults(imdbADT imdb){
         writeMoviesRec(imdb, year, query3File);
         nextYear(imdb);
     }
+    closeFile(query1File);
+    closeFile(query2File);
+    closeFile(query3File);
 }
 
