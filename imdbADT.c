@@ -22,11 +22,6 @@ typedef struct tMovieNode {
     tMovieList nextM;
 } tMovieNode;
 
-typedef struct tGenreQtys {
-    unsigned long qtyFilms;
-    unsigned long qtySeries;
-} tGenreQtys;
-
 typedef struct tYearNode * tYearList;
 
 typedef struct tYearNode {
@@ -34,7 +29,7 @@ typedef struct tYearNode {
     unsigned long qtyFilms;
     unsigned long qtySeries;
     unsigned long qtyShorts;
-    tGenreQtys * qtyByGenre; // Vector de genero
+    unsigned long *qtyByGenre[2]; // primer elemento films, segundo series
     char topSize;
     tMovieList firstM;
     tMovieList iterMovie;
@@ -47,6 +42,15 @@ typedef struct imdbCDT {
     tYearList firstY;
     tYearList iterYear;
 } imdbCDT;
+
+
+static void checkIterInBounds(imdbADT imdb, int checkIterMovie);
+static void freeMoviesRec(tMovieList movie);
+static void freeYearsRec(tYearList years);
+static void loadTitleByYear(tYearList year, tTitle * title);//Query 1
+static void loadTitleByTypeGenre(tYearList year, tTitle * title, char qtyGenres);//Query 2
+static void loadTopMovie(tYearList year, tTitle * title);//Query 3
+static tYearList insertYearRec(tYearList node, unsigned short year, tYearList * result, char qtyGenres);
 
 imdbADT newImdbADT(char ** genres, char qtyGenres) {
     imdbADT imdb = safeMalloc(sizeof(imdbCDT));
@@ -64,7 +68,7 @@ static void checkIterInBounds(imdbADT imdb, int checkIterMovie) {
     }
 }
 
-//ITERADOR DE PELICULAS POR CADA AÑO
+//Iterador de peliculas por cada anio
 void toBeginMovie(imdbADT imdb){
     checkIterInBounds(imdb, 0);
     imdb->iterYear->iterMovie = imdb->iterYear->firstM;
@@ -80,7 +84,6 @@ void nextMovie(imdbADT imdb){
     imdb->iterYear->iterMovie = imdb->iterYear->iterMovie->nextM;
 }
 
-// Pelicula votos rating y generos
 char * getCurrentMovieTitle(imdbADT imdb) {
     checkIterInBounds(imdb, 1);
     return imdb->iterYear->iterMovie->film;
@@ -133,7 +136,8 @@ static void freeYearsRec(tYearList years){
     if(years == NULL)
         return;
     freeMoviesRec(years->firstM);
-    free(years->qtyByGenre);
+    free(years->qtyByGenre[0]);
+    free(years->qtyByGenre[1]);
     freeYearsRec(years->nextY);
     free(years);
 }
@@ -143,7 +147,7 @@ void freeImdb(imdbADT imdb) {
     free(imdb);
 }
 
-//ITERADOR DE AÑOS
+//Iterador de anios
 void toBeginYear(imdbADT imdb){
     imdb->iterYear = imdb->firstY;
 }
@@ -177,6 +181,12 @@ unsigned long getQtySeries(imdbADT imdb){
     return imdb->iterYear->qtySeries;
 }
 
+unsigned long ** getQtyByGenresByYear(imdbADT imdb) {
+    checkIterInBounds(imdb, 0);
+    return imdb->iterYear->qtyByGenre;
+}
+
+
 static void loadTitleByYear(tYearList year, tTitle * title) { //QUERY 1
     switch (title->titleType) {
         case MOVIE:
@@ -197,8 +207,8 @@ static void loadTitleByYear(tYearList year, tTitle * title) { //QUERY 1
 static void loadTitleByTypeGenre(tYearList year, tTitle * title, char qtyGenres) { //QUERY 2
     for (int i = 0; i < qtyGenres; i++) {
         if((title->genres & 1 << i) >> i == 1){
-            year->qtyByGenre[i].qtySeries += (title->titleType == TVMINISERIES || title->titleType == TVSERIES);
-            year->qtyByGenre[i].qtyFilms += title->titleType == MOVIE;
+            year->qtyByGenre[0][i] += title->titleType == MOVIE;
+            year->qtyByGenre[1][i] += (title->titleType == TVMINISERIES || title->titleType == TVSERIES);
         }
     }
 }
@@ -245,7 +255,8 @@ static tYearList insertYearRec(tYearList node, unsigned short year, tYearList * 
         tYearList new = safeMalloc(sizeof(tYearNode));
         new->year = year;
         new->firstM = NULL;
-        new->qtyByGenre = safeCalloc(qtyGenres, sizeof(tGenreQtys));
+        new->qtyByGenre[0] = safeCalloc(qtyGenres, sizeof(unsigned long));
+        new->qtyByGenre[1] = safeCalloc(qtyGenres, sizeof(unsigned long));
         new->qtyFilms = new->qtySeries = new->qtyShorts = 0;
         new->nextY = node;
         new->topSize = 0;
@@ -269,7 +280,6 @@ void loadData(imdbADT imdb, tTitle * title) {
     loadTitleByTypeGenre(pCurrYear, title, imdb->qtyGenres);
 
     if (title->titleType == MOVIE) {
-        //printf("%s:%d\n", title->primaryTitle, title->startYear);
         loadTopMovie(pCurrYear, title);
     }
 }

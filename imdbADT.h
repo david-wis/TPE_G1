@@ -27,6 +27,8 @@ unsigned long getQtyShorts(imdbADT imdb);
 
 unsigned long getQtySeries(imdbADT imdb);
 
+unsigned long ** getQtyByGenresByYear(imdbADT imdb);
+
 unsigned int getCurrentYear(imdbADT imdb);
 
 void toBeginMovie(imdbADT imdb);

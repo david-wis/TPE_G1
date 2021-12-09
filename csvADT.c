@@ -166,6 +166,13 @@ void writeQuery1(csvADT csv, unsigned short year, unsigned long films, unsigned 
     fprintf(csv->file, "%d;%lu;%lu;%lu\n", year, films, series, shorts);
 }
 
+void writeQuery2(csvADT csv, unsigned short year, char qtyGenres, char ** genres, unsigned long ** qtyByGenres){
+    for (int i = 0; i < qtyGenres; i++) {
+        if(qtyByGenres[0][i] || qtyByGenres[1][i])
+            fprintf(csv->file, "%d;%s;%lu;%lu\n", year, genres[i], qtyByGenres[0][i], qtyByGenres[1][i]);
+    }
+}
+
 void writeQuery3(csvADT csv, unsigned short year, char * title, unsigned long votes, float rating, char * genres) {
     fprintf(csv->file, "%d;%s;%lu;%0.2f;%s\n", year, title, votes, rating, genres);
 }
