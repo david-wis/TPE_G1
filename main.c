@@ -6,7 +6,7 @@
 #define QTY_GENRES 32
 #define WRONG_PARAMS "Two arguments were expected"
 
-void loadGenres(char * fileName, char * vecGenres[], size_t * genreDim);
+void loadGenres(char * fileName, char * vecGenres[], char * genreDim);
 
 int main(int argc, char * argv[]) {
     #ifdef RELEASE
@@ -17,7 +17,7 @@ int main(int argc, char * argv[]) {
     #endif
 
     char * titleTypes[] = {"movie", "short", "tvMiniSeries", "tvSeries"};
-    size_t genreDim;
+    char genreDim;
     char * vecGenres[QTY_GENRES];
     loadGenres("/home/jonyloco/CLionProjects/pi/TPE_G1/genres.csv", vecGenres, &genreDim); //TODO: Ponerlo con argv
 
@@ -27,24 +27,21 @@ int main(int argc, char * argv[]) {
     while (!eof(csvTitles)) {
         title = readNextTitle(csvTitles, vecGenres, genreDim, titleTypes, sizeof(titleTypes)/sizeof(char*));
         if (title != NULL) {
-            loadTitleByYear(imdb, title);
-            loadTitleByTypeGenre(imdb, title);
-            if (title->titleType == MOVIE) {
-                printf("%s:%d\n", title->primaryTitle, title->startYear);
-                loadTopMovie(imdb, title);
-            }
+            loadData(imdb, title);
             freeTitle(title);
         }
     }
+    closeFile(csvTitles);
     // TODO: escritura de csv
+    freeImdb(imdb);
     return 0;
 }
 
-void loadGenres(char * fileName, char * vecGenres[], size_t * genreDim) {
+void loadGenres(char * fileName, char * vecGenres[], char * genreDim) {
     csvADT genresCsv = newCsv(fileName, "r");
-    size_t i = 0;
+    int i = 0;
     while (i < QTY_GENRES && !eof(genresCsv))
         vecGenres[i++] = readNextString(genresCsv);
-    *genreDim = i > 0? i - 1 : i;
+    *genreDim = i > 0 ? i - 1 : i;
     closeFile(genresCsv);
 }

@@ -9,12 +9,10 @@
 
 typedef struct imdbCDT * imdbADT;
 
-imdbADT newImdbADT(char ** genres, size_t qtyGenres);
+imdbADT newImdbADT(char ** genres, char qtyGenres);
 
-void loadTitleByYear(imdbADT imdb, tTitle * t);
+void loadData(imdbADT imdb, tTitle * title);
 
-void loadTitleByTypeGenre(imdbADT imdb, tTitle * t);
-
-void loadTopMovie(imdbADT imdb, tTitle * t);
+void freeImdb(imdbADT imdb);
 
 #endif //TPE_G1_IMDBADT_H
