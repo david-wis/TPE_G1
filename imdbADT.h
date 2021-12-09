@@ -27,4 +27,6 @@ unsigned long getQtyShorts(imdbADT imdb);
 
 unsigned long getQtySeries(imdbADT imdb);
 
+unsigned int getCurrentYear(imdbADT imdb);
+
 #endif //TPE_G1_IMDBADT_H

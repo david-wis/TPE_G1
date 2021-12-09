@@ -90,6 +90,10 @@ void nextYear(imdbADT imdb){
     imdb->iterYear = imdb->iterYear->nextY;
 }
 
+unsigned int getCurrentYear(imdbADT imdb){
+    return imdb->iterYear->year;
+}
+
 unsigned long getQtyFilms(imdbADT imdb){
     if(imdb->iterYear == NULL){
         fprintf(stderr, ERR_MSG_OOB);

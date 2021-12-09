@@ -7,6 +7,7 @@
 #define WRONG_PARAMS "Two arguments were expected"
 
 void loadGenres(char * fileName, char * vecGenres[], char * genreDim);
+void writeResults(imdbADT imdb);
 
 int main(int argc, char * argv[]) {
     #ifdef RELEASE
@@ -32,6 +33,7 @@ int main(int argc, char * argv[]) {
         }
     }
     closeFile(csvTitles);
+    writeResults(imdb);
     // TODO: escritura de csv
     freeImdb(imdb);
     return 0;
@@ -44,4 +46,12 @@ void loadGenres(char * fileName, char * vecGenres[], char * genreDim) {
         vecGenres[i++] = readNextString(genresCsv);
     *genreDim = i > 0 ? i - 1 : i;
     closeFile(genresCsv);
+}
+
+void writeResults(imdbADT imdb){
+    toBeginYear(imdb);
+    while (hasNextYear(imdb)){
+        printf("%d - %lu - %lu - %lu\n", getCurrentYear(imdb), getQtyFilms(imdb), getQtyShorts(imdb), getQtySeries(imdb));
+        nextYear(imdb);
+    }
 }
