@@ -32,7 +32,7 @@ static char * readLine(FILE * f) {
        }
     } while(p != NULL && len > 0 && c[len-1] != '\n');
 
-    if (!len || (len == 1 && c[0] == '\n')) {
+    if (!len || c[0] == '\n') {
         free(c);
         return NULL;
     }

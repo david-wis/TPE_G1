@@ -5,7 +5,6 @@
 #include "utils.h"
 #include <stdlib.h>
 #include <stdio.h>
-#include <math.h>
 
 #define ERR_MSG "Not enough memory\n"
 
