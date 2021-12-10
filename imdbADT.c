@@ -205,10 +205,12 @@ static void loadTitleByYear(tYearList year, tTitle * title) { //QUERY 1
 }
 
 static void loadTitleByTypeGenre(tYearList year, tTitle * title, char qtyGenres) { //QUERY 2
-    for (int i = 0; i < qtyGenres; i++) {
-        if(title->genres & 1 << i){
-            year->qtyByGenre[0][i] += title->titleType == MOVIE;
-            year->qtyByGenre[1][i] += (title->titleType == TVMINISERIES || title->titleType == TVSERIES);
+    if(title->titleType == MOVIE || title->titleType == TVMINISERIES || title->titleType == TVSERIES) {
+        int idx = title->titleType != MOVIE;
+        for (int i = 0; i < qtyGenres && title->genres >> i; i++) {
+            if (title->genres & 1 << i) {
+                year->qtyByGenre[idx][i]++;
+            }
         }
     }
 }

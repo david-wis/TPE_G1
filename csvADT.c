@@ -106,7 +106,7 @@ static unsigned int parseGenres(char * s, char ** genres, size_t genresDim) {
     for (size_t i = 0; i < genresDim; ++i) { // TODO: Ver si se puede optimizar
         p = strstr(token, genres[i]);
         if (p != NULL) {
-            len = strlen(p);
+            len = strlen(genres[i]);
             if (p[len] == '\0' || p[len] == ',') {
                 state |= 1<<i;
             }
