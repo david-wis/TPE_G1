@@ -40,7 +40,7 @@ typedef struct tYearNode {
 
 typedef struct imdbCDT {
     char ** genres;
-    char qtyGenres;
+    unsigned char genreDim;
     tYearList firstY;
     tYearList iterYear;
 } imdbCDT;
@@ -50,14 +50,14 @@ static void checkIterInBounds(imdbADT imdb, int checkIterMovie);
 static void freeMoviesRec(tMovieList movie);
 static void freeYearsRec(tYearList years);
 static void loadTitleByYear(tYearList year, tTitle * title);//Query 1
-static void loadTitleByTypeGenre(tYearList year, tTitle * title, char qtyGenres);//Query 2
+static void loadTitleByTypeGenre(tYearList year, tTitle * title, unsigned char genreDim);//Query 2
 static void loadTopMovie(tYearList year, tTitle * title);//Query 3
-static tYearList insertYearRec(tYearList node, unsigned short year, tYearList * result, char qtyGenres);
+static tYearList insertYearRec(tYearList node, unsigned short year, tYearList * result, unsigned char genreDim);
 
-imdbADT newImdbADT(char ** genres, char qtyGenres) {
+imdbADT newImdbADT(char ** genres, unsigned char genreDim) {
     imdbADT imdb = safeMalloc(sizeof(imdbCDT));
     imdb->genres = genres;
-    imdb->qtyGenres = qtyGenres;
+    imdb->genreDim = genreDim;
     imdb->firstY = NULL;
     imdb->iterYear = NULL;
     return imdb;
@@ -111,7 +111,7 @@ char * getCurrentMovieGenres(imdbADT imdb){
         s = safeMalloc(EMPTY_LEN);
         return strcpy(s, EMPTY);
     }
-    for (int i = 0; i < imdb->qtyGenres; i++) {
+    for (int i = 0; i < imdb->genreDim; i++) {
         if (genres & 1 << i) {
             wordlen = strlen(imdb->genres[i]);
             s = safeRealloc(s, len + wordlen + 1);
@@ -204,10 +204,10 @@ static void loadTitleByYear(tYearList year, tTitle * title) { //QUERY 1
     }
 }
 
-static void loadTitleByTypeGenre(tYearList year, tTitle * title, char qtyGenres) { //QUERY 2
+static void loadTitleByTypeGenre(tYearList year, tTitle * title, unsigned char genreDim) { //QUERY 2
     if(title->titleType == MOVIE || title->titleType == TVMINISERIES || title->titleType == TVSERIES) {
         int idx = title->titleType != MOVIE;
-        for (int i = 0; i < qtyGenres && title->genres >> i; i++) {
+        for (int i = 0; i < genreDim && title->genres >> i; i++) {
             if (title->genres & 1 << i) {
                 year->qtyByGenre[idx][i]++;
             }
@@ -252,13 +252,13 @@ static void loadTopMovie(tYearList year, tTitle * title) { //QUERY 3
     }
 }
 
-static tYearList insertYearRec(tYearList node, unsigned short year, tYearList * result, char qtyGenres) {
+static tYearList insertYearRec(tYearList node, unsigned short year, tYearList * result, unsigned char genreDim) {
     if (node == NULL || node->year < year) {
         tYearList new = safeMalloc(sizeof(tYearNode));
         new->year = year;
         new->firstM = NULL;
-        new->qtyByGenre[0] = safeCalloc(qtyGenres, sizeof(unsigned long));
-        new->qtyByGenre[1] = safeCalloc(qtyGenres, sizeof(unsigned long));
+        new->qtyByGenre[0] = safeCalloc(genreDim, sizeof(unsigned long));
+        new->qtyByGenre[1] = safeCalloc(genreDim, sizeof(unsigned long));
         new->qtyFilms = new->qtySeries = new->qtyShorts = 0;
         new->nextY = node;
         new->topSize = 0;
@@ -267,7 +267,7 @@ static tYearList insertYearRec(tYearList node, unsigned short year, tYearList * 
         return new;
     }
     if(node->year > year)
-        node->nextY = insertYearRec(node->nextY, year, result, qtyGenres);
+        node->nextY = insertYearRec(node->nextY, year, result, genreDim);
     else
         *result = node;
     return node;
@@ -275,10 +275,10 @@ static tYearList insertYearRec(tYearList node, unsigned short year, tYearList * 
 
 void loadData(imdbADT imdb, tTitle * title) {
     tYearList pCurrYear;
-    imdb->firstY = insertYearRec(imdb->firstY, title->startYear, &pCurrYear, imdb->qtyGenres);
+    imdb->firstY = insertYearRec(imdb->firstY, title->startYear, &pCurrYear, imdb->genreDim);
 
     loadTitleByYear(pCurrYear, title);
-    loadTitleByTypeGenre(pCurrYear, title, imdb->qtyGenres);
+    loadTitleByTypeGenre(pCurrYear, title, imdb->genreDim);
     if (title->titleType == MOVIE)
         loadTopMovie(pCurrYear, title);
 }

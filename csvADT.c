@@ -5,19 +5,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdarg.h>
 #include "csvADT.h"
 #include "utils.h"
 #include "title.h"
 #define BUFFER_SIZE 256
 #define FILE_ERROR "Could not open file\n"
+#define MODE_ERROR "Operation not permitted\n"
 #define DELIM ";"
 #define EMPTY "\\N"
 
 typedef struct csvCDT {
     FILE * file;
     size_t line;
-    char * mode;
+    tMode mode;
 } csvCDT;
 
 static char * readLine(FILE * f) {
@@ -41,9 +41,17 @@ static char * readLine(FILE * f) {
     return c;
 }
 
-csvADT newCsv(char * path, char * mode) {
+static void checkMode(tMode expected, tMode current) {
+   if (expected != current) {
+       fprintf(stderr, MODE_ERROR);
+       exit(1);
+   }
+}
+
+csvADT newCsv(char * path, tMode mode) {
+    char * stringModes[] = {"r", "w"};
     csvADT csv = safeMalloc(sizeof(csvCDT));
-    csv->file = fopen(path, mode);
+    csv->file = fopen(path, stringModes[mode]);
     csv->mode = mode;
     if (csv->file == NULL) {
         fprintf(stderr, FILE_ERROR);
@@ -59,6 +67,7 @@ void closeFile(csvADT csv){
 }
 
 char * readNextString(csvADT csv) {
+    checkMode(READ, csv->mode);
     if (csv->line == 0) {
         free(readLine(csv->file)); // Leemos la primera linea sin guardarla
         csv->line++;
@@ -67,7 +76,7 @@ char * readNextString(csvADT csv) {
     return readLine(csv->file);
 }
 
-static unsigned long parseInt(char * s) { // TODO: Ver si conviene separarlo
+static unsigned long parseInt(char * s) {
     char * token = strtok(s, DELIM);
     if (strcmp(token, EMPTY) == 0)
         return 0;
@@ -102,12 +111,13 @@ static unsigned int parseGenres(char * s, char ** genres, size_t genresDim) {
     char * token = strtok(s, DELIM);
     char * p;
     unsigned int state = 0;
-    size_t len;
-    for (size_t i = 0; i < genresDim; ++i) { // TODO: Ver si se puede optimizar
+    size_t len, totalLen = strlen(token);
+    for (size_t i = 0; i < genresDim && totalLen > 0; ++i) {
         p = strstr(token, genres[i]);
         if (p != NULL) {
             len = strlen(genres[i]);
             if (p[len] == '\0' || p[len] == ',') {
+                totalLen -= (len + (p[len] == ','));
                 state |= 1<<i;
             }
         }
@@ -123,7 +133,7 @@ static unsigned int parseGenres(char * s, char ** genres, size_t genresDim) {
  */
 
 tTitle * readNextTitle(csvADT csv, char ** genres, size_t genresDim,
-                       char * titleTypes[], size_t typesDim) {
+                        char * titleTypes[], size_t typesDim) {
     char * line = readNextString(csv);
     if (line == NULL)
         return NULL;
@@ -132,7 +142,6 @@ tTitle * readNextTitle(csvADT csv, char ** genres, size_t genresDim,
     int error;
 
     title->id = parseString(line);
-
     title->titleType = parseType(NULL, titleTypes, typesDim, &error);
     if (error) {
         free(title->id);
@@ -153,7 +162,6 @@ tTitle * readNextTitle(csvADT csv, char ** genres, size_t genresDim,
     title->genres = parseGenres(NULL, genres, genresDim);
     title->avgRating = parseFloat(NULL);
     title->numVotes = parseInt(NULL);
-
     if(title->numVotes == 0){
         freeTitle(title);
         free(line);
@@ -162,29 +170,33 @@ tTitle * readNextTitle(csvADT csv, char ** genres, size_t genresDim,
 
     title->runtimeMinutes = parseInt(NULL);
     free(line);
-
     return title;
 }
 
 int eof(csvADT csv) {
-     return feof(csv->file);
+    checkMode(READ, csv->mode);
+    return feof(csv->file);
 }
 
 void writeQuery1(csvADT csv, unsigned short year, unsigned long films, unsigned long series, unsigned long shorts) {
+    checkMode(WRITE, csv->mode);
     fprintf(csv->file, "%d;%lu;%lu;%lu\n", year, films, series, shorts);
 }
 
-void writeQuery2(csvADT csv, unsigned short year, char qtyGenres, char ** genres, unsigned long ** qtyByGenres){
-    for (int i = 0; i < qtyGenres; i++) {
+void writeQuery2(csvADT csv, unsigned short year, unsigned char genreDim, char ** genres, unsigned long ** qtyByGenres){
+    checkMode(WRITE, csv->mode);
+    for (int i = 0; i < genreDim; i++) {
         if(qtyByGenres[0][i] || qtyByGenres[1][i])
             fprintf(csv->file, "%d;%s;%lu;%lu\n", year, genres[i], qtyByGenres[0][i], qtyByGenres[1][i]);
     }
 }
 
-void writeQuery3(csvADT csv, unsigned short year, char * title, unsigned long votes, float rating, char * genres) {
+void writeQuery3(csvADT csv, unsigned short year, const char * title, unsigned long votes, float rating, const char * genres) {
+    checkMode(WRITE, csv->mode);
     fprintf(csv->file, "%d;%s;%lu;%0.2f;%s\n", year, title, votes, rating, genres);
 }
 
 void writeString(csvADT csv, const char * txt) {
+    checkMode(WRITE, csv->mode);
     fprintf(csv->file, "%s\n", txt);
 }

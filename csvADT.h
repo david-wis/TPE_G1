@@ -8,7 +8,9 @@
 
 typedef struct csvCDT * csvADT;
 
-csvADT newCsv(char * path, char * mode);
+typedef enum {READ=0, WRITE} tMode;
+
+csvADT newCsv(char * path, tMode mode);
 
 char * readNextString(csvADT csv);
 
@@ -22,8 +24,8 @@ void writeString(csvADT csv, const char * txt);
 
 void writeQuery1(csvADT csv, unsigned short year, unsigned long films, unsigned long series, unsigned long shorts);
 
-void writeQuery2(csvADT csv, unsigned short year, char qtyGenres, char ** genres, unsigned long ** qtyByGenres);
+void writeQuery2(csvADT csv, unsigned short year, unsigned char genreDim, char ** genres, unsigned long ** qtyByGenres);
 
-void writeQuery3(csvADT csv, unsigned short year, char * title, unsigned long votes, float rating, char * genres);
+void writeQuery3(csvADT csv, unsigned short year, const char * title, unsigned long votes, float rating, const char * genres);
 
 #endif //TPE_G1_CSVADT_H

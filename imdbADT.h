@@ -9,7 +9,7 @@
 
 typedef struct imdbCDT * imdbADT;
 
-imdbADT newImdbADT(char ** genres, char qtyGenres);
+imdbADT newImdbADT(char ** genres, unsigned char genreDim);
 
 void loadData(imdbADT imdb, tTitle * title);
 

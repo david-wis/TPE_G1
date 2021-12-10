@@ -1,11 +1,10 @@
 #include <stdio.h>
 #include "csvADT.h"
 #include "imdbADT.h"
+#include <time.h>
 
 #define QTY_GENRES 32
 #define WRONG_PARAMS "Two arguments were expected\n"
-#define READ "r"
-#define WRITE "w"
 #define QUERY1_HEADERS "year;films;series;shorts"
 #define QUERY2_HEADERS "year;genre;films;series"
 #define QUERY3_HEADERS "year;film;votes;rating;genres"
@@ -14,10 +13,10 @@
 #define QUERY3_FILE "query3.csv"
 #define QTY_PARAMS 3
 
-void loadGenres(char * fileName, char * vecGenres[], char * genreDim);
-void writeResults(imdbADT imdb, char genreDim, char ** genres);
+void loadGenres(char * fileName, char * vecGenres[], unsigned char * genreDim);
+void writeResults(imdbADT imdb, unsigned char genreDim, char ** genres);
 void writeMoviesRec(imdbADT imdb, unsigned short year, csvADT csv);
-void freeGenres(char ** genres, char genreDim);
+void freeGenres(char ** genres, unsigned char genreDim);
 
 int main(int argc, char * argv[]) {
     if (argc < QTY_PARAMS) {
@@ -25,8 +24,13 @@ int main(int argc, char * argv[]) {
         exit(1);
     }
 
+    #if DEBUG
+        clock_t t;
+        t = clock();
+    #endif
+
     char * titleTypes[] = {"movie", "short", "tvMiniSeries", "tvSeries"};
-    char genreDim;
+    unsigned char genreDim;
     char * vecGenres[QTY_GENRES];
     loadGenres(argv[1], vecGenres, &genreDim); //TODO: Ponerlo con argv
 
@@ -45,19 +49,26 @@ int main(int argc, char * argv[]) {
     writeResults(imdb, genreDim, vecGenres);
     freeImdb(imdb);
     freeGenres(vecGenres, genreDim);
+
+    #if DEBUG
+        t = clock() - t;
+        double time_taken = ((double)t)/CLOCKS_PER_SEC;
+        printf("Tardo: %f\n", time_taken);
+    #endif
+
     return 0;
 }
 
-void loadGenres(char * fileName, char * vecGenres[], char * genreDim) {
+void loadGenres(char * fileName, char * vecGenres[], unsigned char * genreDim) {
     csvADT genresCsv = newCsv(fileName, READ);
     int i = 0;
     while (i < QTY_GENRES && !eof(genresCsv))
         vecGenres[i++] = readNextString(genresCsv);
-    *genreDim = i > 0 ? i - 1 : i;
+    *genreDim = i > 0 ? i - 1 : 0;
     closeFile(genresCsv);
 }
 
-void freeGenres(char ** genres, char genreDim){
+void freeGenres(char ** genres, unsigned char genreDim){
     for(int i = 0; i < genreDim; i++)
         free(genres[i]);
 }
@@ -75,7 +86,7 @@ void writeMoviesRec(imdbADT imdb, unsigned short year, csvADT csv) {
     free(genres);
 }
 
-void writeResults(imdbADT imdb, char genreDim, char ** genres){
+void writeResults(imdbADT imdb, unsigned char genreDim, char ** genres){
     toBeginYear(imdb);
     csvADT query1File = newCsv(QUERY1_FILE, WRITE);
     csvADT query2File = newCsv(QUERY2_FILE, WRITE);
