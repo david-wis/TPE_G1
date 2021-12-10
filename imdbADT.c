@@ -11,6 +11,8 @@
 #include "title.h"
 #define ERR_MSG_OOB "Out of bounds\n"
 #define MAX_MOVIE_COUNT 5
+#define EMPTY "\\N"
+#define EMPTY_LEN 3
 
 typedef struct tMovieNode * tMovieList;
 
@@ -106,20 +108,18 @@ char * getCurrentMovieGenres(imdbADT imdb){
     size_t wordlen;
     unsigned int genres = imdb->iterYear->iterMovie->genres;
     if (!genres) {
-        s = safeMalloc(3);
-        strcpy(s, "\\N");
-        return s;
+        s = safeMalloc(EMPTY_LEN);
+        return strcpy(s, EMPTY);
     }
     for (int i = 0; i < imdb->qtyGenres; i++) {
         if (genres & 1 << i) {
             wordlen = strlen(imdb->genres[i]);
-            s = safeRealloc(s, len + wordlen + 2);
+            s = safeRealloc(s, len + wordlen + 1);
             strcpy(s + len, imdb->genres[i]);
             s[len + wordlen] = ',';
             len += (wordlen + 1);
         }
     }
-    s = safeRealloc(s, len);
     s[len-1] = 0;
     return s;
 }
@@ -278,10 +278,7 @@ void loadData(imdbADT imdb, tTitle * title) {
     imdb->firstY = insertYearRec(imdb->firstY, title->startYear, &pCurrYear, imdb->qtyGenres);
 
     loadTitleByYear(pCurrYear, title);
-
     loadTitleByTypeGenre(pCurrYear, title, imdb->qtyGenres);
-
-    if (title->titleType == MOVIE) {
+    if (title->titleType == MOVIE)
         loadTopMovie(pCurrYear, title);
-    }
 }
