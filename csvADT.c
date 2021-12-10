@@ -31,13 +31,19 @@ static char * readLine(FILE * f) {
            c = safeRealloc(c, len + BUFFER_SIZE);
        }
     } while(p != NULL && len > 0 && c[len-1] != '\n');
-    if (!len) {
+
+    if (!len || (len == 1 && c[0] == '\n')) {
         free(c);
         return NULL;
     }
-    c = safeRealloc(c, len);
-    if (c[len-1]=='\n')
+
+    if (c[len-1]=='\n') {
+        c = safeRealloc(c, len);
         c[len-1] = 0;
+    } else  {
+        c = safeRealloc(c, len + 1);
+        c[len] = 0;
+    }
     return c;
 }
 

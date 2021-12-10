@@ -34,8 +34,16 @@ int main(int argc, char * argv[]) {
     char * vecGenres[QTY_GENRES];
     loadGenres(argv[1], vecGenres, &genreDim); //TODO: Ponerlo con argv
 
+    #if DEBUG
+        printf("Los generos disponibles son %d: \n", genreDim);
+        for (int i = 0; i < genreDim; i++) {
+            printf("%s\n", vecGenres[i]);
+        }
+    #endif
+
     imdbADT imdb = newImdbADT(vecGenres, genreDim);
     csvADT csvTitles = newCsv(argv[2], READ); //TODO: Ponerlo con argv
+
     tTitle * title;
     size_t typesDim = sizeof(titleTypes)/sizeof(char*);
     while (!eof(csvTitles)) {
@@ -62,9 +70,11 @@ int main(int argc, char * argv[]) {
 void loadGenres(char * fileName, char * vecGenres[], unsigned char * genreDim) {
     csvADT genresCsv = newCsv(fileName, READ);
     int i = 0;
+    char * s;
     while (i < QTY_GENRES && !eof(genresCsv))
-        vecGenres[i++] = readNextString(genresCsv);
-    *genreDim = i > 0 ? i - 1 : 0;
+        if ((s = readNextString(genresCsv)) != NULL)
+            vecGenres[i++] = s;
+    *genreDim = i;
     closeFile(genresCsv);
 }
 
@@ -78,7 +88,7 @@ void writeMoviesRec(imdbADT imdb, unsigned short year, csvADT csv) {
         return;
     char * title = getCurrentMovieTitle(imdb);
     unsigned long votes = getCurrentMovieVotes(imdb);
-    float rating = getCurrentMovieRaiting(imdb);
+    float rating = getCurrentMovieRating(imdb);
     char * genres = getCurrentMovieGenres(imdb);
     nextMovie(imdb);
     writeMoviesRec(imdb, year, csv);

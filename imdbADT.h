@@ -41,7 +41,7 @@ char * getCurrentMovieTitle(imdbADT imdb);
 
 unsigned long getCurrentMovieVotes(imdbADT imdb);
 
-float getCurrentMovieRaiting(imdbADT imdb);
+float getCurrentMovieRating(imdbADT imdb);
 
 char * getCurrentMovieGenres(imdbADT imdb);
 

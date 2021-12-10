@@ -96,7 +96,7 @@ unsigned long getCurrentMovieVotes(imdbADT imdb){
     return imdb->iterYear->iterMovie->votes;
 }
 
-float getCurrentMovieRaiting(imdbADT imdb){
+float getCurrentMovieRating(imdbADT imdb){
     checkIterInBounds(imdb, 1);
     return imdb->iterYear->iterMovie->rating;
 }
