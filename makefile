@@ -8,7 +8,7 @@ all:
 
 debug: COMPILER+=$(DEBUG_COMPILER)
 debug: all
-	./$(OUTPUT_FILE) genres.csv imdb.csv
+	./$(OUTPUT_FILE) imdb.csv genres.csv
 
 imdbADT.o:
 	$(COMPILER) -c imdbADT.c utils.c title.c

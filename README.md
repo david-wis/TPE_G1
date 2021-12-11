@@ -13,8 +13,8 @@ funciones que consideramos útiles en utils.c, y el main.c . Todos salvo este ú
 `make -f makefile all`
 
 ## Ejemplos de uso
-* `./imdb ../genres.csv imdb.csv`
-* `./imdb genres.csv imdb.csv`
+* `./imdb imdb.csv ../genres.csv`
+* `./imdb imdb.csv genres.csv`
 
 ### Autores
 * Liu, Jonathan Daniel

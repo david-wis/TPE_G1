@@ -69,10 +69,10 @@ int main(int argc, char * argv[]) {
     char * titleTypes[] = {"movie", "short", "tvMiniSeries", "tvSeries"}; // Vector de tipos de título
     unsigned char genreDim;
     char * vecGenres[QTY_GENRES];
-    loadGenres(argv[1], vecGenres, &genreDim);
+    loadGenres(argv[2], vecGenres, &genreDim);
 
     imdbADT imdb = newImdbADT(genreDim);
-    csvADT csvTitles = newCsv(argv[2], READ);
+    csvADT csvTitles = newCsv(argv[1], READ);
 
     tTitle * title;
     size_t typesDim = sizeof(titleTypes)/sizeof(char*);
