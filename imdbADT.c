@@ -17,6 +17,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <strings.h>
 #include "utils.h"
 #include "title.h"
 #define ERR_MSG_OOB "Out of bounds\n"   // Mensaje de error en caso de que se quiera acceder a un nodo inválido
@@ -284,7 +285,7 @@ static void loadTitleByTypeGenre(tYearList year, tTitle * title, unsigned char g
 static int compareMovies(tTitle * title, tMovieNode * movie) {
     int aux = (title->numVotes > movie->votes) - (title->numVotes < movie->votes);
     if (!aux) {
-        aux = strcmp(movie->film, title->primaryTitle);
+        aux = strcasecmp(movie->film, title->primaryTitle);
     }
     return aux;
 }

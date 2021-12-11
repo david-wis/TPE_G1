@@ -180,18 +180,24 @@ static int parseType(char * s, char * titleTypes[], size_t typesDim, int * error
 
 static unsigned int parseGenres(char * s, char ** genres, size_t genresDim) {
     char * token = strtok(s, DELIM);
-    char * p;
+    char * p, * localToken;
     unsigned int state = 0;
+
     size_t len, totalLen = strlen(token);
     for (size_t i = 0; i < genresDim && totalLen > 0; ++i) {    // Si ya se leyeron todos los géneros del título, corta el ciclo
-        p = strstr(token, genres[i]);
-        if (p != NULL) {
-            len = strlen(genres[i]);
-            if (p[len] == '\0' || p[len] == ',') {  // Checkea si lo encontrado es una coincidencia completa y no simplemente una subcadena
-                totalLen -= (len + (p[len] == ','));
-                state |= 1<<i;
+        localToken = token;
+        do {
+            p = strstr(localToken, genres[i]);
+            if (p != NULL) {  // Checkea si encontró una coincidencia
+                len = strlen(genres[i]);
+                if (p[len] == '\0' || p[len] == ',') {  // Chequea si lo encontrado es una coincidencia completa y no simplemente una subcadena
+                    totalLen -= (len + (p[len] == ','));
+                    state |= 1<<i;
+                } else {
+                    localToken = p + len; // Era un substring, asi que hay que buscar desde ahi
+                }
             }
-        }
+        } while (p != NULL && !(state & 1 << i)); // Si lo encuentra y el bit se setea en 1, o si directamente no lo encuentra, sale
     }
     return state;
 }
@@ -199,8 +205,9 @@ static unsigned int parseGenres(char * s, char ** genres, size_t genresDim) {
 tTitle * readNextTitle(csvADT csv, char ** genres, size_t genresDim,
                         char * titleTypes[], size_t typesDim) {
     char * line = readNextString(csv);
-    if (line == NULL)   // Si la linea está vacía, se ignora
+    if (line == NULL) {   // Si la linea está vacía, se ignora
         return NULL;
+    }
 
     tTitle * title = safeMalloc(sizeof(tTitle));
     int error;
