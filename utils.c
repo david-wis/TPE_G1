@@ -13,7 +13,7 @@
 #include <stdio.h>
 #include <errno.h>
 
-#define ERR_MSG "Not enough memory\n"   // Mensaje de error en caso de error de falta de memoria
+#define ERR_MSG "Not enough memory\n"       // Mensaje de error en caso de error de falta de memoria
 
 static void checkInvalidMemory(void * m) {
     if (errno == ENOMEM || m == NULL) {
