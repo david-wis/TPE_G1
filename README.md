@@ -1,12 +1,12 @@
 ## Tabla de contenidos
-* [Informacion general] (#informacion-general)
-* [Generar los ejecutables] (#generar-los-ejecutables)
-* [Ejemplos de uso] (#ejemplos-de-uso)
-* [Autores] (#autores)
+* Información general
+* Generar los ejecutables
+* Ejemplos de uso
+* Autores
 
-## Informacion general
+## Información general
 El proyecto permite procesar datos de series y películas del sitio IMDb y sacar estadísticas a partir de ellos.
-<br>En la carpeta se encuentran el archivo de los ADTs de imdbADT.c, csvADT.c, la estructura de titulo del title.c, algunas
+<br>En la carpeta se encuentran el archivo de los ADTs de imdbADT.c, csvADT.c, la estructura de título del title.c, algunas
 funciones que consideramos útiles en utils.c, y el main.c . Todos salvo este último con sus .h
 
 ## Generar los ejecutables
