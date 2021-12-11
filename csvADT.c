@@ -222,14 +222,14 @@ tTitle * readNextTitle(csvADT csv, char ** genres, size_t genresDim,
     }
 
     title->primaryTitle = parseString(NULL);
-    title->startYear = parseInt(NULL);
+    title->startYear = parseInt(NULL); // Devuelve un long que se castea a unsigned short
     if (title->startYear == 0)  {   // Si no tiene año de comienzo se ignora
         freeTitle(title);
         free(line);
         return NULL;
     }
 
-    title->endYear = parseInt(NULL);
+    title->endYear = parseInt(NULL); // Devuelve un long que se castea a unsigned short
     title->genres = parseGenres(NULL, genres, genresDim);
     title->avgRating = parseFloat(NULL);
     title->numVotes = parseInt(NULL);
@@ -239,7 +239,7 @@ tTitle * readNextTitle(csvADT csv, char ** genres, size_t genresDim,
         return NULL;
     }
 
-    title->runtimeMinutes = parseInt(NULL);
+    title->runtimeMinutes = parseInt(NULL); // Devuelve un long que se castea a unsigned int
     free(line);
     return title;
 }
